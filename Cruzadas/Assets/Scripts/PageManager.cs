@@ -18,6 +18,9 @@ public class PageManager : MonoBehaviour {
 
     public Text txt;
 
+    public float delayTimer;
+    public bool delayActive;
+
     public GameObject bookOpened;
     public GameObject bookClosed;
 
@@ -34,32 +37,49 @@ public class PageManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (delayActive == true)
+            delayTimer += Time.deltaTime;
+
+        if(delayTimer > 1.2f)
+        {
+            delayActive = false;
+            delayTimer = 0;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape) && delayActive == false)
         {
             bookOpened.SetActive(false);
             bookClosed.SetActive(true);
+            delayActive = true;
         }
 
             if (bookOpened.activeSelf == true)
         {
             if (pg < pages.Length - 1)
             {
-                if (Input.GetKeyDown(KeyCode.RightArrow))
+                if (Input.GetKeyDown(KeyCode.RightArrow) && delayActive == false)
+                {
                     right = true;
+                    delayActive = true;
+                }
             }
 
             if (pg > 0)
             {
-                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                if (Input.GetKeyDown(KeyCode.LeftArrow) && delayActive == false)
+                {
                     left = true;
+                    delayActive = true;
+                }
             }
 
             else if (pg == 0)
             {
-                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                if (Input.GetKeyDown(KeyCode.LeftArrow) && delayActive == false)
                 {
                     bookOpened.SetActive(false);
                     bookClosed.SetActive(true);
+                    delayActive = true;
                 }
             }
 
@@ -115,19 +135,30 @@ public class PageManager : MonoBehaviour {
 
     public void Left()
     {
-        if(pg > 0)
-            left = true;
-
-        else if (pg == 0)
+        if (delayActive == false)
         {
-            bookOpened.SetActive(false);
-            bookClosed.SetActive(true);
+            if (pg > 0)
+            {
+                left = true;
+            }
+            else if (pg == 0)
+            {
+                bookOpened.SetActive(false);
+                bookClosed.SetActive(true);
+            }
+
+            delayActive = true;
         }
     }
 
     public void Right()
     {
-        if (pg < pages.Length - 1)
-            right = true;
+        if (delayActive == false)
+        {
+            if (pg < pages.Length - 1 && pages[pg].transform.localScale.x >= 1)
+                right = true;
+
+            delayActive = true;
+        }
     }
 }
